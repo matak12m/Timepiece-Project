@@ -1,0 +1,17 @@
+
+body {
+    
+    
+    background-size: 100%;
+    
+}
+
+
+canvas {
+  
+    height:95vh;
+      width:auto;
+      border-color: black;
+    border-width: 5px;
+    border:solid;
+}
