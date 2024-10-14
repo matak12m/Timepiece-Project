@@ -49,19 +49,38 @@ let timePosition;
 
 
 
-function getTime(){
+function getTime(timeType){
     currentTime = new Date();
     hours = currentTime.getHours();
     minutes = currentTime.getMinutes();
     seconds = currentTime.getSeconds();
     miliseconds = currentTime.getMilliseconds();
 
+  
 
-    minutes = minutes + seconds/60 + miliseconds/60000;
+    if (timeType == "hoursRounded") {
 
-    console.log(minutes)
+        return hours;
+    }
 
-    return minutes;
+
+    seconds = seconds + miliseconds/1000;
+    minutes = minutes + seconds/60
+    hours = hours + minutes/60;
+
+
+    //console.log(minutes)
+
+    if (timeType == "minutes") {
+        return minutes;
+    }
+    else if (timeType == "hours") {
+        return hours;
+    }
+    else if (timeType == "seconds") {
+        return seconds;
+    }
+    
    
 
 }
@@ -75,8 +94,7 @@ function update() {
 
    
 
-    
-
+    cometHandler();
 
     draw();
 
@@ -106,13 +124,13 @@ ctx2.clearRect(-front_canvas.width *0.5, -front_canvas.height *0.5, front_canvas
 
 
 
-
-Comet(0, 60, 60, "blue");
-
-
+//TODO: remove comets once they collide with sun, make comets relate to time - readable clock - through reading hours.
+Comet(0, 0, 60, 60, "blue", "comet", 0, "minutes");
 
 
-Comet(90, 20, 2, "green");
+
+
+Comet(0, 0, 60, 2, "green", "planet", 1, "minutes");
 
 
 
@@ -120,22 +138,36 @@ Comet(90, 20, 2, "green");
 
 
 
-
-
-function Comet(addAngle, timeToCollide, rotationSlowness, colour) {
+function Comet(addRadius, addAngle, timeToCollide, rotationSlowness, colour, orbitType, clockwise, timeType) {
 
 
 
-timePosition = getTime();
+timePosition = getTime(timeType);
 
+    let radius;
+    let cosinus;
+    let sinus;
 
-    let radius = timeToCollide - timePosition;  //getting closer to the sun as time goes on, may be moved.
+    if (orbitType == "comet" ) {
+
+    radius = timeToCollide - timePosition +addRadius;  //getting closer to the sun as time goes on, may be moved.
+    }
+    else if (orbitType == "planet") {
+    radius = timePosition + addRadius;
+    }
+
 
     let angle = (timePosition % rotationSlowness) * 6 + addAngle;  // angle in 360 degrees, affected by function value
 
-    let sinus = Math.sin(angle /( 2 * Math.PI));  //converted from radians to degrees
-    let cosinus = Math.cos(angle /( 2 * Math.PI));
 
+    if (clockwise == 0) {
+        sinus = Math.sin(angle /( 2 * Math.PI));  //converted from radians to degrees
+        cosinus = Math.cos(angle /( 2 * Math.PI));
+    }
+    else if (clockwise ==1) {           //swapping sine and cosine changes the direction of rotation
+        sinus = Math.cos(angle /( 2 * Math.PI));  //converted from radians to degrees
+        cosinus = Math.sin(angle /( 2 * Math.PI));
+    }
 
 
     //console.log(radius);
@@ -149,5 +181,56 @@ ctx2.arc((radius * 12.5 + (sunRadius/2)) * sinus  , (radius* 12.5 + (sunRadius/2
 ctx2.fillStyle = colour;
 ctx2.fill();
 
+
+}
+
+
+
+
+function cometHandler() {
+    //dictates which comets are visible based on time
+    //base 4 system up to 24: 0, 1, 2, 3 10, 11, 12, 13 20, 21, 22, 23 30, 31, 32, 33 100, 101, 102, 103 110, 111, 112, 113,
+   
+
+    let hoursCalc = getTime("hoursRounded")
+    let hoursBaseFour = convertToBaseFour(hoursCalc);
+
+    
+
+
+
+
+
+}
+
+
+
+
+
+function convertToBaseFour(input) {
+    let baseFour = 0;
+
+    let hoursStorage = input;  //current time in hours rounded down
+    
+    
+    if (hoursStorage >=16) {               //calculate base 4
+        baseFour+=100;
+        hoursStorage-=16;
+    }
+
+    while (hoursStorage >= 4) {
+        baseFour +=10;
+        hoursStorage-=4;
+    }
+    
+    while (hoursStorage >= 1) {
+        baseFour +=1;
+        hoursStorage-=1;
+    }
+
+//console.log(input);
+//console.log(baseFour);
+
+return baseFour;
 
 }
