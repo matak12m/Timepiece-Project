@@ -94,12 +94,13 @@ function update() {
 
    
 
-    cometHandler();
+    
 
     draw();
 
+    cometHandler();
     
-    setTimeout(update, 500);//every 30 miliseconds = 33 frames per second
+    setTimeout(update, 30);//every 30 miliseconds = 33 frames per second
     console.log("new frame")
 }
 
@@ -130,7 +131,7 @@ Comet(0, 0, 60, 60, "blue", "comet", 0, "minutes");
 
 
 
-Comet(0, 0, 60, 2, "green", "planet", 1, "minutes");
+
 
 
 
@@ -153,11 +154,12 @@ timePosition = getTime(timeType);
     radius = timeToCollide - timePosition +addRadius;  //getting closer to the sun as time goes on, may be moved.
     }
     else if (orbitType == "planet") {
-    radius = timePosition + addRadius;
+    radius = addRadius;
     }
 
 
-    let angle = (timePosition % rotationSlowness) * 6 + addAngle;  // angle in 360 degrees, affected by function value
+    let angle = (timePosition % rotationSlowness) * (360/rotationSlowness) + addAngle/( 2*Math.PI);  //to have a perfect planet cycle, the rotation slowness needs to be set to around 555       seconds hand moves about 105 radians per second == 6 degrees per second
+        // angle in 360 degrees, affected by function value
 
 
     if (clockwise == 0) {
@@ -195,9 +197,11 @@ function cometHandler() {
     let hoursCalc = getTime("hoursRounded")
     let hoursBaseFour = convertToBaseFour(hoursCalc);
 
+
+    Comet(40 , -60, 0 , 549, "green", "planet", 1, "seconds"); //TODO: figure out the perfect angleSlowness
     
 
-
+   // console.log("cometHandler");
 
 
 
@@ -227,6 +231,9 @@ function convertToBaseFour(input) {
         baseFour +=1;
         hoursStorage-=1;
     }
+
+
+
 
 //console.log(input);
 //console.log(baseFour);
