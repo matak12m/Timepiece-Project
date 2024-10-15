@@ -36,7 +36,7 @@ ctx2.translate(transX, transY);
 
 
 
-const sunRadius = 100;
+const sunRadius = 80;
 
 
 let currentTime;
@@ -56,19 +56,20 @@ function getTime(timeType){
     seconds = currentTime.getSeconds();
     miliseconds = currentTime.getMilliseconds();
 
-  
+    
+    //hours = 15;
 
     if (timeType == "hoursRounded") {
 
         return hours;
     }
 
-
+    
     seconds = seconds + miliseconds/1000;
     minutes = minutes + seconds/60
     hours = hours + minutes/60;
 
-
+   //minutes = 59.9;
     //console.log(minutes)
 
     if (timeType == "minutes") {
@@ -111,22 +112,38 @@ update();
 
 function draw() {
 
-    ctx1.fillStyle = "black";
-    ctx1.fillRect(-front_canvas.width *0.5, -front_canvas.height *0.5, back_canvas.width, back_canvas.height);
-
-
-
-ctx1.beginPath();
-ctx1.arc(0, 0 ,sunRadius, 0, 2 * Math.PI);
-ctx1.fillStyle = "orange";
+    
+    ctx1.beginPath();
+ctx1.arc(0, 0 ,750, 0, 2 * Math.PI);
+ctx1.fillStyle = "rgba(0, 0, 0, 0.1)"
 ctx1.fill();
 
-ctx2.clearRect(-front_canvas.width *0.5, -front_canvas.height *0.5, front_canvas.width, front_canvas.height)
 
 
 
-//TODO: remove comets once they collide with sun, make comets relate to time - readable clock - through reading hours.
-Comet(0, 0, 60, 60, "blue", "comet", 0, "minutes");
+
+
+ctx2.beginPath();
+ctx2.arc(0, 0 ,750, 0, 2 * Math.PI);
+ctx2.fillStyle = "rgba(0, 0, 0, 0.1)"
+ctx2.fill();
+
+//ctx2.clearRect(-front_canvas.width *0.5, -front_canvas.height *0.5, front_canvas.width, front_canvas.height)
+
+// Create gradient
+const grad=ctx2.createRadialGradient(50,150,750,50,150,750);
+grad.addColorStop(0,"black");
+grad.addColorStop(1,"white");  
+
+// Fill rectangle with gradient
+ctx2.fillStyle = grad;
+ctx2.fillRect(-front_canvas.width *0.5, -front_canvas.height *0.5, front_canvas.width, front_canvas.height);
+
+ctx2.beginPath();
+ctx2.arc(0, 0 ,sunRadius, 0, 2 * Math.PI);
+ctx2.fillStyle = "orange";
+ctx2.fill();
+
 
 
 
@@ -139,7 +156,7 @@ Comet(0, 0, 60, 60, "blue", "comet", 0, "minutes");
 
 
 
-function Comet(addRadius, addAngle, timeToCollide, rotationSlowness, colour, orbitType, clockwise, timeType) {
+function Comet(addRadius, addAngle, timeToCollide, rotationSlowness, colour, orbitType, clockwise, timeType, sizeMultiplier) {
 
 
 
@@ -162,13 +179,15 @@ timePosition = getTime(timeType);
         // angle in 360 degrees, affected by function value
 
 
-    if (clockwise == 0) {
+    if (clockwise == -1) {
         sinus = Math.sin(angle /( 2 * Math.PI));  //converted from radians to degrees
         cosinus = Math.cos(angle /( 2 * Math.PI));
+        
     }
     else if (clockwise ==1) {           //swapping sine and cosine changes the direction of rotation
         sinus = Math.cos(angle /( 2 * Math.PI));  //converted from radians to degrees
         cosinus = Math.sin(angle /( 2 * Math.PI));
+        
     }
 
 
@@ -179,7 +198,7 @@ timePosition = getTime(timeType);
 
     
 ctx2.beginPath();
-ctx2.arc((radius * 12.5 + (sunRadius/2)) * sinus  , (radius* 12.5 + (sunRadius/2))*cosinus  , 50, 0, 2*Math.PI);
+ctx2.arc((radius * 12.5 + (sunRadius/2)) * sinus  , (radius* 12.5 + (sunRadius/2))*cosinus  ,20 *sizeMultiplier, 0, 2*Math.PI);
 ctx2.fillStyle = colour;
 ctx2.fill();
 
@@ -192,21 +211,76 @@ ctx2.fill();
 function cometHandler() {
     //dictates which comets are visible based on time
     //base 4 system up to 24: 0, 1, 2, 3 10, 11, 12, 13 20, 21, 22, 23 30, 31, 32, 33 100, 101, 102, 103 110, 111, 112, 113,
-   
+    let clockwiseRotate;
 
     let hoursCalc = getTime("hoursRounded")
     let hoursBaseFour = convertToBaseFour(hoursCalc);
 
+    Comet(40 , -60, 0 , 549, "green", "planet", 1, "seconds", 1.1);
+    Comet(40 , -60, 0 , 549, "lime", "planet", 1, "seconds", 1); //TODO: figure out the perfect angleSlowness
 
-    Comet(40 , -60, 0 , 549, "green", "planet", 1, "seconds"); //TODO: figure out the perfect angleSlowness
+
+    //comets:
+    //clockwise cyan
+    //counter-clockwise red
+    //clockwise yellow
+    //counter-clockwise purple
+
+
+    console.log(hoursBaseFour)
+
+    if (hoursBaseFour > 40) {
+        Comet(0 , 90 , 60 , 105, "blue", "comet", 1, "minutes", 1.05);
+        Comet(0 , 90 , 60 , 105, "cyan", "comet", 1, "minutes", 1);
+        hoursBaseFour-=100;
+    }
+
     
+    if (hoursBaseFour < 40) {
+        for (let i =hoursBaseFour; i> 4; i-=10){
+            clockwiseRotate = oddOrEven((i-i%10)/10);
 
-   // console.log("cometHandler");
+            Comet(-i *9.6 ,i*170 , 60 +i * 9.4 ,60 - i * 10, "orange", "comet", -clockwiseRotate, "minutes", 1.05);
+            Comet(-i *9.6 ,i*170 , 60 +i * 9.4 ,60 - i * 10, "yellow", "comet", -clockwiseRotate, "minutes", 1);
+            hoursBaseFour-=10;
+        }
+
+
+    }
+
+
+    if (hoursBaseFour < 4) {
+
+        for (let i = hoursBaseFour; i > 0; i-- ){
+
+            clockwiseRotate = oddOrEven(i);
+            Comet(  -i * 28 ,i*230 , 60+i * 25.5 , 60 + i*30, "pink", "comet", clockwiseRotate, "minutes", 1.05);
+            Comet(  -i * 28 ,i*230 , 60+i * 25.5 , 60 + i*30, "purple", "comet", clockwiseRotate, "minutes", 1);
+            hoursBaseFour--;
+        }
+
+    }
 
 
 
 }
 
+
+
+function oddOrEven(input) {
+    if (input % 2 == 1) {
+        return -1;
+
+    }
+    else if (input % 2 ==0) {
+        return 1;
+    }
+    else {
+        console.log("error - non-integer number entered to oddOrEven()")
+        return 0;
+    }
+
+}
 
 
 
@@ -239,5 +313,11 @@ function convertToBaseFour(input) {
 //console.log(baseFour);
 
 return baseFour;
+
+}
+
+
+function animateSun() {
+
 
 }
