@@ -13,7 +13,7 @@ front_canvas.height = 1500;
 
 
 ctx1.imageSmoothingEnabled = false;  //makes the pixelart assets crisp
-ctx2.imageSmoothingEnabled = false;  //makes the pixelart assets crisp
+//ctx2.imageSmoothingEnabled = false;  //makes the pixelart assets crisp
 
 let transX = front_canvas.width * 0.5,
     transY = front_canvas.height * 0.5;
@@ -99,7 +99,7 @@ function update() {
 
     draw();
 
-    cometHandler();
+    
     
     setTimeout(update, 30);//every 30 miliseconds = 33 frames per second
     console.log("new frame")
@@ -145,9 +145,9 @@ ctx2.fillStyle = "orange";
 ctx2.fill();
 
 
+cometHandler();
 
-
-
+ctx2.drawImage(backgroundWhite,-front_canvas.width *0.5, -front_canvas.height *0.5 )
 
 
 
